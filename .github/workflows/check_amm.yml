@@ -2,9 +2,8 @@ name: Revisar Capacidad Instalada AMM
 
 on:
   schedule:
-    # Todos los lunes 07:00 hora Guatemala (13:00 UTC, Guatemala no usa horario de verano)
     - cron: "0 13 * * 1"
-  workflow_dispatch: {}   # permite ejecutarlo manualmente desde la pestaña "Actions"
+  workflow_dispatch: {}
 
 permissions:
   contents: write
@@ -35,20 +34,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/
-          git commit -m "AMM: nueva version de Capacidad_Instalada_2026.xls ($(date +%F))"
+          git commit -m "AMM: nueva version de Capacidad_Instalada_2026.xls"
           git push
 
       - name: Crear aviso (issue) si hubo cambios
         if: steps.check.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh issue create \
-            --title "Nuevo archivo de Capacidad Instalada AMM - $(date +%F)" \
-            --body "Se detecto un cambio en el archivo publicado por la AMM:
-
-https://www.amm.org.gt/pdfs2/2026/Capacidad_Instalada_2026.xls
-
-Se actualizo automaticamente en este repositorio: \`data/Capacidad_Instalada_2026.xls\`.
-
-Siguiente paso: descarga ese archivo y subelo a Claude para actualizar el Excel con las graficas."
+        run: gh issue create --title "Nuevo archivo de Capacidad Instalada AMM" --body "Se detecto un cambio en https://www.amm.org.gt/pdfs2/2026/Capacidad_Instalada_2026.xls. Se actualizo data/Capacidad_Instalada_2026.xls en el repositorio. Descargalo y subelo a Claude para actualizar el Excel con las graficas."
