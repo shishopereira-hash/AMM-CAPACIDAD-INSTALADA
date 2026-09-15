@@ -34,11 +34,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/
-          git commit -m "AMM: nueva version de Capacidad_Instalada_2026.xls"
+          git commit -m "AMM: nueva version del archivo"
           git push
 
-      - name: Crear aviso (issue) si hubo cambios
+      - name: Crear aviso si hubo cambios
         if: steps.check.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh issue create --title "Nuevo archivo de Capacidad Instalada AMM" --body "Se detecto un cambio en https://www.amm.org.gt/pdfs2/2026/Capacidad_Instalada_2026.xls. Se actualizo data/Capacidad_Instalada_2026.xls en el repositorio. Descargalo y subelo a Claude para actualizar el Excel con las graficas."
+        run: gh issue create --title "Nuevo archivo de Capacidad Instalada AMM" --body "Hay una version nueva en https://www.amm.org.gt/pdfs2/2026/Capacidad_Instalada_2026.xls -- ya se actualizo data/Capacidad_Instalada_2026.xls en este repositorio. Descargalo y subelo a Claude para actualizar el Excel."
