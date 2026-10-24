@@ -1,11 +1,18 @@
 # Vigilancia de Capacidad Instalada — AMM Guatemala
 
-Revisa automáticamente, una vez por semana, si la AMM publicó una versión nueva
-del archivo de Capacidad Instalada (https://www.amm.org.gt/pdfs2/2026/Capacidad_Instalada_2026.xls).
+Revisa automáticamente, tres veces al día (9 AM, 1 PM y 5 PM, horario que da cron-job.org),
+si la AMM publicó una versión nueva del archivo de Capacidad Instalada
+(https://www.amm.org.gt/pdfs2/AAAA/Capacidad_Instalada_AAAA.xls). En diciembre y enero revisa
+también el del año siguiente / anterior, así no hay que tocar nada al cambiar de año.
 
 Si detecta un cambio:
-1. Guarda el archivo nuevo en `data/Capacidad_Instalada_2026.xls` (commit automático).
-2. Abre un **Issue** en este repositorio para avisarte.
+1. Guarda el archivo nuevo en `data/Capacidad_Instalada_AAAA.xls` (commit automático).
+2. Publica el aviso, con el archivo adjunto, en el canal de Slack **#capacidad-instalada**
+   (app *Predespacho AMM*; secreto `SLACK_BOT_TOKEN` en este repositorio).
+
+Prueba del canal: **Actions → Revisar Capacidad Instalada AMM → Run workflow**, escribir `si` en "prueba".
+
+> Lo de abajo es la configuración original (aviso por Issue); el aviso ahora es por Slack.
 
 ## Configuración (una sola vez)
 

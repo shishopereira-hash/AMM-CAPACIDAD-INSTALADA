@@ -1,13 +1,23 @@
 name: Revisar Capacidad Instalada AMM
 
+# Revisa si la AMM publicó una versión nueva del archivo de Capacidad Instalada y avisa en Slack.
+# El horario lo da cron-job.org (9 AM, 1 PM y 5 PM de Guatemala); el de GitHub queda como respaldo.
 on:
   schedule:
-    - cron: "0 13 * * *"
-  workflow_dispatch: {}
+    - cron: "0 23 * * *"     # respaldo: 5:00 PM Guatemala
+  workflow_dispatch:
+    inputs:
+      prueba:
+        description: "Escribe 'si' para mandar un mensaje de prueba al canal de Slack"
+        required: false
+        default: ""
 
 permissions:
   contents: write
-  issues: write
+
+concurrency:
+  group: capacidad
+  cancel-in-progress: false
 
 jobs:
   check:
@@ -24,21 +34,24 @@ jobs:
       - name: Instalar dependencias
         run: pip install requests
 
-      - name: Revisar archivo de la AMM
+      - name: Revisar archivo de la AMM y avisar en Slack
         id: check
-        run: python scripts/check_capacidad.py
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: C0CCR4Y0VEU     # canal #capacidad-instalada
+        run: |
+          if [ "${{ github.event.inputs.prueba }}" = "si" ]; then
+            python scripts/check_capacidad.py --prueba
+          else
+            python scripts/check_capacidad.py
+          fi
 
-      - name: Commitear archivo actualizado
+      - name: Guardar archivo actualizado
         if: steps.check.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/
-          git commit -m "AMM: nueva version del archivo"
-          git push
-
-      - name: Crear aviso si hubo cambios
-        if: steps.check.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh issue create --title "Nuevo archivo de Capacidad Instalada AMM" --body "Hay una version nueva en https://www.amm.org.gt/pdfs2/2026/Capacidad_Instalada_2026.xls -- ya se actualizo data/Capacidad_Instalada_2026.xls en este repositorio. Descargalo y subelo a Claude para actualizar el Excel."
+          git add -A data/
+          git commit -m "AMM: nueva versión del archivo de Capacidad Instalada"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push -q && exit 0; sleep 5; done
+          exit 1
